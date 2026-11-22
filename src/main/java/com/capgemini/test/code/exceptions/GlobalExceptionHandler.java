@@ -2,6 +2,7 @@ package com.capgemini.test.code.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -23,5 +24,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> handleRoomNotFound(RoomNotFoundException ex) {
         ApiErrorResponse response = new ApiErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage());
         return ResponseEntity.internalServerError().body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorResponse> handleBeanValidationError(MethodArgumentNotValidException ex) {
+        String field = ex.getBindingResult().getFieldErrors().get(0).getField();
+        ApiErrorResponse response = new ApiErrorResponse(HttpStatus.CONFLICT.value(), "error validation " + field);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 }

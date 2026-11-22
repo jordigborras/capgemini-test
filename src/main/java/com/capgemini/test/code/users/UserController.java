@@ -13,17 +13,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public UserResponse getUserById(@PathVariable("id") Long id) {
+        User user = userService.getUserById(id);
+        return userMapper.toResponse(user);
     }
 
     @PostMapping
     public ResponseEntity<Map<String, Long>> createUser(@Valid @RequestBody UserRequest req) {
         User user = userService.createUser(req);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("id", user.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id", user.getId()));
     }
 }

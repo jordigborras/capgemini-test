@@ -10,6 +10,7 @@ import com.capgemini.test.code.rooms.RoomRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,10 +21,12 @@ public class UserService {
     private final RoomRepository roomRepository;
     private final UserMapper userMapper;
 
+    @Transactional(readOnly = true)
     public User getUserById(Long id) {
         return userRepository.findByIdAndRoomId(id, 1L).orElseThrow(UserNotFoundException::new);
     }
 
+    @Transactional
     public User createUser(UserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyExistsException();
